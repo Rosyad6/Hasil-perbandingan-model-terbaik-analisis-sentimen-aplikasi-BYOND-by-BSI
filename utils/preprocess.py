@@ -11,7 +11,21 @@ factory = StemmerFactory()
 stemmer = factory.create_stemmer()
 
 # Stopword
-more_stop_words = []
+more_stop_words = [ "yang",
+                    "dan",
+                    "di",
+                    "ke",
+                    "dari",
+                    "untuk",
+                    "ini",
+                    "itu",
+                    "nya",
+                    "aja",
+                    "gak",
+                    "nggak",
+                    "bsi",
+                    "byond",
+                    "aplikasi"]
 
 stop_words = StopWordRemoverFactory().get_stop_words()
 stop_words.extend(more_stop_words)
