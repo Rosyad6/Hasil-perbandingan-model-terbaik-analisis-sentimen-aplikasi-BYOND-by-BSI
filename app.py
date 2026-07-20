@@ -86,12 +86,12 @@ if uploaded_file:
 
         c2.metric(
             "Positive",
-            positive
+            positif
         )
 
         c3.metric(
             "Negative",
-            negative
+            negatif
         )
 
         c4.metric(
