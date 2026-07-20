@@ -46,10 +46,7 @@ if uploaded_file:
 
     st.dataframe(df.head())
 
-    text_column = st.selectbox(
-        "Pilih Kolom Ulasan",
-        df.columns
-    )
+    text_column = "content"
 
     if st.button("Lakukan Analisis Sentimen"):
 
