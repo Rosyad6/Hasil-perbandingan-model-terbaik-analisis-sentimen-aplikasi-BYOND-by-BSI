@@ -141,6 +141,26 @@ if uploaded_file:
             )
         )
 
+        col1, col2 = st.columns(2)
+
+        with col1:
+            st.subheader("Kata Kunci Positive")
+        
+            st.write(
+                ", ".join(
+                    [word for word, count in positive_keywords]
+                )
+            )
+
+        with col2:
+            st.subheader("Kata Kunci Negative")
+        
+            st.write(
+                ", ".join(
+                    [word for word, count in negative_keywords]
+                )
+            )
+
         st.subheader(
             "Hasil Prediksi"
         )
