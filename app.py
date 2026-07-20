@@ -2,7 +2,6 @@ import streamlit as st
 
 from utils.data_loader import load_data
 from utils.predictor import predict_sentiment
-from utils.visualizer import create_wordcloud
 
 # =========================
 # CONFIG
@@ -111,52 +110,6 @@ if uploaded_file:
         st.bar_chart(
             sentiment_count
         )
-
-    st.subheader("Wordcloud Positive")
-
-    positive_text = " ".join(
-        df[
-        df["sentimen"] == "Positive"
-        ][text_column]
-        .fillna("")
-        .astype(str)
-        )
-
-    st.write("Jumlah Positive:",
-         len(df[df["sentimen"] == "Positive"]))
-
-    st.write("Isi positive_text:")
-    st.write(positive_text[:500])
-
-    fig_pos = create_wordcloud(positive_text)
-
-    if fig_pos:
-        st.pyplot(fig_pos)
-    else:
-        st.warning("Tidak ada data untuk Wordcloud Positive")
-
-    st.subheader("Wordcloud Negative")
-
-    negative_text = " ".join(
-        df[
-            df["sentimen"] == "Negative"
-        ][text_column]
-        .fillna("")
-        .astype(str)
-    )
-
-    st.write("Jumlah Negative:",
-         len(df[df["sentimen"] == "Negative"]))
-
-    st.write("Isi negative_text:")
-    st.write(negative_text[:500])
-
-    fig_neg = create_wordcloud(negative_text)
-
-    if fig_neg:
-        st.pyplot(fig_neg)
-    else:
-        st.warning("Tidak ada data untuk Wordcloud Negative")
 
         st.subheader(
             "Hasil Prediksi"
