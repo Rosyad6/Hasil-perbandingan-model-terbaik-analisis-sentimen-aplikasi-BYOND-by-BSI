@@ -11,7 +11,7 @@ def create_sentiment_pie(sentiment_count):
         sentiment_count,
         labels=sentiment_count.index,
         autopct="%1.1f%%",
-        startangle=90
+        startangle=50
     )
 
     ax.set_title("Distribusi Sentimen")
