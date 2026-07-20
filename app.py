@@ -114,7 +114,7 @@ if uploaded_file:
 
     st.subheader("Wordcloud Positive")
 
-        positive_text = " ".join(
+    positive_text = " ".join(
         df[
         df["sentimen"] == "Positive"
         ][text_column]
