@@ -1,19 +1,19 @@
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 
-def create_wordcloud(text):
+def create_sentiment_pie(sentiment_count):
 
-    wc = WordCloud(
-        width=800,
-        height=400,
-        background_color='white'
-    ).generate(text)
+    fig, ax = plt.subplots(figsize=(5, 5))
 
-    fig, ax = plt.subplots()
+    ax.pie(
+        sentiment_count,
+        labels=sentiment_count.index,
+        autopct="%1.1f%%",
+        startangle=90
+    )
 
-    ax.imshow(wc)
-
-    ax.axis('off')
+    ax.set_title("Distribusi Sentimen")
 
     return fig
