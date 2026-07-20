@@ -3,6 +3,7 @@ import streamlit as st
 from utils.data_loader import load_data
 from utils.predictor import predict_sentiment
 from utils.visualizer import create_sentiment_pie
+from collections import Counter
 
 # =========================
 # CONFIG
