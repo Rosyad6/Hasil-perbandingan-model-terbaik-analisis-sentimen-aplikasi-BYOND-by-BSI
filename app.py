@@ -117,7 +117,7 @@ if uploaded_file:
         ))
 
         st.write("Isi positive_text:")
-        st.write(positive_text[:500])
+        st.write(positif_text[:500])
         
         st.subheader(
             "Wordcloud Positive"
