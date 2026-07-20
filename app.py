@@ -47,6 +47,9 @@ if uploaded_file:
 
     st.dataframe(df.head())
 
+    st.write("Daftar Kolom Dataset:")
+    st.write(df.columns.tolist())
+
     text_column = "content"
 
     if st.button("Lakukan Analisis Sentimen"):
