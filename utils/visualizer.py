@@ -5,13 +5,13 @@ import matplotlib.pyplot as plt
 
 def create_sentiment_pie(sentiment_count):
 
-    fig, ax = plt.subplots(figsize=(5, 5))
+    fig, ax = plt.subplots(figsize=(3, 3))
 
     ax.pie(
         sentiment_count,
         labels=sentiment_count.index,
         autopct="%1.1f%%",
-        startangle=50
+        startangle=90
     )
 
     ax.set_title("Distribusi Sentimen")
