@@ -112,7 +112,7 @@ if uploaded_file:
             sentiment_count
         )
 
-     st.subheader("Wordcloud Positive")
+    st.subheader("Wordcloud Positive")
 
         positive_text = " ".join(
         df[
