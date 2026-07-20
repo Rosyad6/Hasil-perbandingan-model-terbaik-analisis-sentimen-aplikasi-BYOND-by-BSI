@@ -56,6 +56,9 @@ if uploaded_file:
 
         df['sentimen'] = prediction
 
+        st.write("Label hasil prediksi:")
+        st.write(df["sentimen"].value_counts())
+
         positif = (
             df['sentimen'] == 'positif'
         ).sum()
