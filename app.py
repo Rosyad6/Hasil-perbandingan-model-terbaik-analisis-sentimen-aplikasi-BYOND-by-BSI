@@ -71,7 +71,7 @@ if uploaded_file:
 
         umum = (
             "Positive"
-            if positive > negative
+            if positif > negatif
             else "Negative"
         )
 
