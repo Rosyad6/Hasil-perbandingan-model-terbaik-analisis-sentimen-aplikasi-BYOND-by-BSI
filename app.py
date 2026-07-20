@@ -112,6 +112,13 @@ if uploaded_file:
             sentiment_count
         )
 
+        st.write("Jumlah Positive:", len(
+        df[df["sentimen"] == "Positive"]
+        ))
+
+        st.write("Isi positive_text:")
+        st.write(positive_text[:500])
+        
         st.subheader(
             "Wordcloud Positive"
         )
@@ -129,6 +136,13 @@ if uploaded_file:
             )
         )
 
+        st.write("Jumlah Negative:", len(
+        df[df["sentimen"] == "Negative"]
+        ))
+
+        st.write("Isi negative_text:")
+        st.write(negative_text[:500])
+        
         st.subheader(
             "Wordcloud Negative"
         )
