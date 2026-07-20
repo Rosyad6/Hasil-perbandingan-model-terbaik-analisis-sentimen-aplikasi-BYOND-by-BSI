@@ -109,6 +109,32 @@ if uploaded_file:
             .value_counts()
         )
 
+        # Kata kunci Positive
+        positive_text = " ".join(
+            df[
+            df["sentimen"] == "Positive"
+            ][text_column]
+            .fillna("")
+            .astype(str)
+        )
+
+        # Kata kunci Negative
+        negative_text = " ".join(
+            df[
+            df["sentimen"] == "Negative"
+            ][text_column]
+            .fillna("")
+            .astype(str)
+        )
+
+        positive_keywords = Counter(
+            positive_text.split()
+        ).most_common(10)
+
+        negative_keywords = Counter(
+            negative_text.split()
+        ).most_common(10)
+
         st.pyplot(
             create_sentiment_pie(
                 sentiment_count
