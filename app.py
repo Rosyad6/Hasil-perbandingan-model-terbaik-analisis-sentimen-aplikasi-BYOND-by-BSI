@@ -112,53 +112,51 @@ if uploaded_file:
             sentiment_count
         )
 
-        st.write("Jumlah Positive:", len(
-        df[df["sentimen"] == "Positive"]
-        ))
-
-        st.write("Isi positive_text:")
-        st.write(positif_text[:500])
-        
-        st.subheader(
-            "Wordcloud Positive"
-        )
+     st.subheader("Wordcloud Positive")
 
         positive_text = " ".join(
-            df[
-                df.sentimen == "positive"
-            ][text_column]
-            .astype(str)
+        df[
+        df["sentimen"] == "Positive"
+        ][text_column]
+        .fillna("")
+        .astype(str)
         )
 
-        st.pyplot(
-            create_wordcloud(
-                positif_text
-            )
-        )
+    st.write("Jumlah Positive:",
+         len(df[df["sentimen"] == "Positive"]))
 
-        st.write("Jumlah Negative:", len(
-        df[df["sentimen"] == "Negative"]
-        ))
+    st.write("Isi positive_text:")
+    st.write(positive_text[:500])
 
-        st.write("Isi negative_text:")
-        st.write(negative_text[:500])
-        
-        st.subheader(
-            "Wordcloud Negative"
-        )
+    fig_pos = create_wordcloud(positive_text)
 
-        negative_text = " ".join(
-            df[
-                df.sentimen == "negative"
-            ][text_column]
-            .astype(str)
-        )
+    if fig_pos:
+        st.pyplot(fig_pos)
+    else:
+        st.warning("Tidak ada data untuk Wordcloud Positive")
 
-        st.pyplot(
-            create_wordcloud(
-                negative_text
-            )
-        )
+    st.subheader("Wordcloud Negative")
+
+    negative_text = " ".join(
+        df[
+            df["sentimen"] == "Negative"
+        ][text_column]
+        .fillna("")
+        .astype(str)
+    )
+
+    st.write("Jumlah Negative:",
+         len(df[df["sentimen"] == "Negative"]))
+
+    st.write("Isi negative_text:")
+    st.write(negative_text[:500])
+
+    fig_neg = create_wordcloud(negative_text)
+
+    if fig_neg:
+        st.pyplot(fig_neg)
+    else:
+        st.warning("Tidak ada data untuk Wordcloud Negative")
 
         st.subheader(
             "Hasil Prediksi"
