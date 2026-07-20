@@ -2,6 +2,7 @@ import streamlit as st
 
 from utils.data_loader import load_data
 from utils.predictor import predict_sentiment
+from utils.visualizer import create_sentiment_pie
 
 # =========================
 # CONFIG
@@ -107,8 +108,10 @@ if uploaded_file:
             .value_counts()
         )
 
-        st.bar_chart(
-            sentiment_count
+        st.pyplot(
+            create_sentiment_pie(
+                sentiment_count
+            )
         )
 
         st.subheader(
