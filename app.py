@@ -4,6 +4,7 @@ from utils.data_loader import load_data
 from utils.predictor import predict_sentiment
 from utils.visualizer import create_sentiment_pie
 from collections import Counter
+from utils.preprocess import preprocess_text
 
 # =========================
 # CONFIG
@@ -57,6 +58,13 @@ if uploaded_file:
 
         df['sentimen'] = prediction
 
+        df["processed_text"] = (
+            df["content"]
+            .fillna("")
+            .astype(str)
+            .apply(preprocess_text)
+        )
+
         st.write("Label hasil prediksi:")
         st.write(df["sentimen"].value_counts())
 
@@ -109,28 +117,26 @@ if uploaded_file:
             .value_counts()
         )
 
-        # Kata kunci Positive
+        # =========================
+        # KATA KUNCI
+        # =========================
+
         positive_text = " ".join(
             df[
-            df["sentimen"] == "Positive"
-            ][text_column]
-            .fillna("")
-            .astype(str)
+                df["sentimen"] == "Positive"
+            ]["processed_text"]
         )
 
-        # Kata kunci Negative
         negative_text = " ".join(
             df[
-            df["sentimen"] == "Negative"
-            ][text_column]
-            .fillna("")
-            .astype(str)
+                df["sentimen"] == "Negative"
+            ]["processed_text"]
         )
 
         positive_keywords = Counter(
             positive_text.split()
         ).most_common(10)
-
+        
         negative_keywords = Counter(
             negative_text.split()
         ).most_common(10)
@@ -146,20 +152,14 @@ if uploaded_file:
         with col1:
             st.subheader("Kata Kunci Positive")
         
-            st.write(
-                ", ".join(
-                    [word for word, count in positive_keywords]
-                )
-            )
+        for word, count in positive_keywords:
+            st.write(f"• {word} ({count})")
 
         with col2:
             st.subheader("Kata Kunci Negative")
         
-            st.write(
-                ", ".join(
-                    [word for word, count in negative_keywords]
-                )
-            )
+        for word, count in negative_keywords:
+            st.write(f"• {word} ({count})")
 
         st.subheader(
             "Hasil Prediksi"
