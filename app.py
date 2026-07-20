@@ -60,19 +60,19 @@ if uploaded_file:
         st.write(df["sentimen"].value_counts())
 
         positif = (
-            df['sentimen'] == 'positif'
+        df['sentimen'] == 'Positive'
         ).sum()
 
         negatif = (
-            df['sentimen'] == 'negatif'
+        df['sentimen'] == 'Negative'
         ).sum()
 
         total = len(df)
 
         umum = (
-            "Positif"
-            if positif > negatif
-            else "Negatif"
+            "Positive"
+            if positive > negative
+            else "Negative"
         )
 
         st.subheader("Ringkasan Utama")
@@ -85,13 +85,13 @@ if uploaded_file:
         )
 
         c2.metric(
-            "Positif",
-            positif
+            "Positive",
+            positive
         )
 
         c3.metric(
-            "Negatif",
-            negatif
+            "Negative",
+            negative
         )
 
         c4.metric(
@@ -113,12 +113,12 @@ if uploaded_file:
         )
 
         st.subheader(
-            "Wordcloud Positif"
+            "Wordcloud Positive"
         )
 
         positive_text = " ".join(
             df[
-                df.sentimen == "positif"
+                df.sentimen == "positive"
             ][text_column]
             .astype(str)
         )
@@ -130,12 +130,12 @@ if uploaded_file:
         )
 
         st.subheader(
-            "Wordcloud Negatif"
+            "Wordcloud Negative"
         )
 
         negative_text = " ".join(
             df[
-                df.sentimen == "negatif"
+                df.sentimen == "negative"
             ][text_column]
             .astype(str)
         )
