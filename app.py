@@ -125,7 +125,7 @@ if uploaded_file:
 
         st.pyplot(
             create_wordcloud(
-                positive_text
+                positif_text
             )
         )
 
