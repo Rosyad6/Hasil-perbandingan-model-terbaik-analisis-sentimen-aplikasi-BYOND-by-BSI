@@ -152,13 +152,13 @@ if uploaded_file:
         with col1:
             st.subheader("Kata Kunci Positive")
         
-        for word, count in positive_keywords:
+            for word, count in positive_keywords:
             st.write(f"• {word} ({count})")
 
         with col2:
             st.subheader("Kata Kunci Negative")
         
-        for word, count in negative_keywords:
+            for word, count in negative_keywords:
             st.write(f"• {word} ({count})")
 
         st.subheader(
