@@ -16,7 +16,11 @@ more_stop_words = [ "yang", "dan", "di", "ke", "dari", "ini", "itu", "untuk", "d
     "sudah", "belum", "pada", "dalam", "oleh", "karena", "jika", "maka",
     "agar", "supaya", "namun", "tetapi", "sehingga", "seperti", "sangat",
     "lebih", "banyak", "bisa", "dapat", "harus", "boleh", "saja", "pun",
-    "nya", "kali", "aja", "nih", "sih", "deh", "dong", "kok", "yg",]
+    "nya", "kali", "aja", "nih", "sih", "deh", "dong", "kok", "yg", "yang", "dan", "di", "ke", "dari", "untuk",
+    "ini", "itu", "nya", "aja",
+    "ga", "gak", "banget", "sangat",
+    "lebih", "buat", "jadi", "bisa",
+    "aplikasi", "byond", "bsi",]
 
 stop_words = StopWordRemoverFactory().get_stop_words()
 stop_words.extend(more_stop_words)
