@@ -11,21 +11,12 @@ factory = StemmerFactory()
 stemmer = factory.create_stemmer()
 
 # Stopword
-more_stop_words = [ "yang",
-                    "dan",
-                    "di",
-                    "ke",
-                    "dari",
-                    "untuk",
-                    "ini",
-                    "itu",
-                    "nya",
-                    "aja",
-                    "gak",
-                    "nggak",
-                    "bsi",
-                    "byond",
-                    "aplikasi"]
+more_stop_words = [ "yang", "dan", "di", "ke", "dari", "ini", "itu", "untuk", "dengan",
+    "adalah", "atau", "juga", "ada", "saya", "kamu", "kita", "akan",
+    "sudah", "belum", "pada", "dalam", "oleh", "karena", "jika", "maka",
+    "agar", "supaya", "namun", "tetapi", "sehingga", "seperti", "sangat",
+    "lebih", "banyak", "bisa", "dapat", "harus", "boleh", "saja", "pun",
+    "nya", "kali", "aja", "nih", "sih", "deh", "dong", "kok", "yg",]
 
 stop_words = StopWordRemoverFactory().get_stop_words()
 stop_words.extend(more_stop_words)
