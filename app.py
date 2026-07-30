@@ -1,3 +1,4 @@
+from collections import Counter
 import joblib
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -96,7 +97,7 @@ def load_sastrawi():
 stemmer, stop_words_remover_new = load_sastrawi()
 
 
-# 2. Caching Load Model & Vectorizer (Menggunakan Joblib & Folder 'model/')
+# 2. Caching Load Model & Vectorizer
 @st.cache_resource
 def load_model_and_vectorizer():
     try:
@@ -125,22 +126,16 @@ def preprocess_text(text):
     return text
 
 
-# 4. Fungsi Aturan Sentimen Berdasarkan Nilai Skor/Rating
-def get_sentiment_by_score(score):
-    try:
-        score = float(score)
-        if score <= 2:
-            return "Negative"
-        else:
-            return "Positive"
-    except (ValueError, TypeError):
-        return "Positive"
+# 4. Fungsi Mengambil Kata Kunci Terbanyak
+def get_top_keywords(text_series, top_n=10):
+    all_words = " ".join(text_series.dropna()).split()
+    counter = Counter(all_words)
+    return counter.most_common(top_n)
 
 
 # 5. Fungsi Visualisasi Pie Chart
 def create_sentiment_pie(sentiment_count):
     fig, ax = plt.subplots(figsize=(3.5, 3.5))
-
     fig.patch.set_alpha(0.0)
     ax.patch.set_alpha(0.0)
 
@@ -178,66 +173,46 @@ if uploaded_file is not None:
 
         st.success(f"File '{uploaded_file.name}' berhasil diunggah!")
 
-        # Opsi Pilihan Kolom Teks Ulasan
         kolom_pilihan = st.selectbox("Pilih kolom ulasan:", df.columns)
 
-        # Cek secara otomatis jika ada kolom skor/rating di dataset
-        kolom_score = None
-        possible_score_cols = [
-            c
-            for c in df.columns
-            if c.lower() in ["score", "rating", "star", "skor"]
-        ]
-        if possible_score_cols:
-            kolom_score = st.selectbox(
-                "Pilih kolom nilai/skor ulasan (opsional):", possible_score_cols
-            )
-
         if st.button("Lakukan Analisis Sentimen"):
-            with st.spinner("Memproses data..."):
-                # Step A: Preprocessing Teks
+            with st.spinner("Memproses data dan menghitung probabilitas..."):
+                # Preprocessing
                 df["Teks_Bersih"] = df[kolom_pilihan].apply(preprocess_text)
 
-                # Step B: Prediksi Sentimen
+                # Prediksi & Hitung Confidence Score per Baris
                 if model is not None and vectorizer is not None:
-                    # Menggunakan Model ML untuk memprediksi
                     X_vec = vectorizer.transform(df["Teks_Bersih"])
                     df["Sentimen_Prediksi"] = model.predict(X_vec)
-                elif kolom_score and kolom_score in df.columns:
-                    # Menggunakan Logika Skor (<=2 Negatif, >=3 Positif)
-                    df["Sentimen_Prediksi"] = df[kolom_score].apply(
-                        get_sentiment_by_score
-                    )
-                elif "sentiment" in df.columns:
-                    df["Sentimen_Prediksi"] = df["sentiment"]
+
+                    # Menghitung Tingkat Kepercayaan (Confidence Score %)
+                    if hasattr(model, "predict_proba"):
+                        probabilities = model.predict_proba(X_vec)
+                        max_probs = probabilities.max(axis=1) * 100
+                        df["Tingkat Kepercayaan (%)"] = max_probs.round(2)
                 else:
-                    df["Sentimen_Prediksi"] = "Positive"
+                    if "sentiment" in df.columns:
+                        df["Sentimen_Prediksi"] = df["sentiment"]
+                    else:
+                        df["Sentimen_Prediksi"] = "Positive"
+                    df["Tingkat Kepercayaan (%)"] = 100.0
+
+            # Simpan dataframe hasil ke session state Streamlit
+            st.session_state["df_result"] = df
+            st.session_state["kolom_pilihan"] = kolom_pilihan
+
+        # Tampilkan Hasil Jika Sudah Diproses
+        if "df_result" in st.session_state:
+            df = st.session_state["df_result"]
+            kolom_pilihan = st.session_state["kolom_pilihan"]
 
             # --------------------------------------------------
-            # SECTION 1: Pratinjau Dataset
-            # --------------------------------------------------
-            st.subheader("Pratinjau Dataset")
-            st.dataframe(df, use_container_width=True)
-
-            # --------------------------------------------------
-            # SECTION 2: Label Hasil Prediksi
-            # --------------------------------------------------
-            st.subheader("Label hasil prediksi")
-            sentiment_count = df["Sentimen_Prediksi"].value_counts()
-            df_label_summary = pd.DataFrame(
-                {
-                    "sentiment": sentiment_count.index,
-                    "count": sentiment_count.values,
-                }
-            )
-            st.dataframe(df_label_summary, hide_index=True)
-
-            # --------------------------------------------------
-            # SECTION 3: Ringkasan Utama (Metrics)
+            # SECTION 1: Ringkasan Utama & Label
             # --------------------------------------------------
             st.subheader("Ringkasan Utama")
-            col1, col2, col3, col4 = st.columns(4)
+            sentiment_count = df["Sentimen_Prediksi"].value_counts()
 
+            col1, col2, col3, col4 = st.columns(4)
             total_ulasan = len(df)
             total_positif = sentiment_count.get(
                 "Positive", 0
@@ -255,10 +230,82 @@ if uploaded_file is not None:
             col4.metric("Sentimen Dominan", sentimen_dominan)
 
             # --------------------------------------------------
+            # SECTION 2: Filter Hasil Prediksi & Tabel
+            # --------------------------------------------------
+            st.subheader("Eksplorasi & Filter Hasil Prediksi")
+
+            f_col1, f_col2 = st.columns([1, 2])
+            with f_col1:
+                options = ["Semua"] + list(
+                    df["Sentimen_Prediksi"].unique()
+                )
+                selected_sentiment = st.selectbox(
+                    "Filter Berdasarkan Sentimen:", options
+                )
+
+            with f_col2:
+                search_keyword = st.text_input(
+                    "Cari Kata Kunci pada Ulasan:", ""
+                )
+
+            # Penerapan Filter
+            df_filtered = df.copy()
+            if selected_sentiment != "Semua":
+                df_filtered = df_filtered[
+                    df_filtered["Sentimen_Prediksi"] == selected_sentiment
+                ]
+
+            if search_keyword:
+                df_filtered = df_filtered[
+                    df_filtered[kolom_pilihan]
+                    .astype(str)
+                    .str.contains(search_keyword, case=False, na=False)
+                ]
+
+            st.write(
+                f"Menampilkan **{len(df_filtered)}** ulasan dari total **{len(df)}** ulasan:"
+            )
+            st.dataframe(df_filtered, use_container_width=True)
+
+            # --------------------------------------------------
+            # SECTION 3: Kata Kunci Terbanyak (Top Keywords)
+            # --------------------------------------------------
+            st.subheader("Kata Kunci Terbanyak")
+            k_col1, k_col2 = st.columns(2)
+
+            df_pos = df[
+                df["Sentimen_Prediksi"].isin(["Positive", "Positif"])
+            ]
+            df_neg = df[
+                df["Sentimen_Prediksi"].isin(["Negative", "Negatif"])
+            ]
+
+            with k_col1:
+                st.markdown("#### 🟢 Top 10 Kata Sentimen Positif")
+                if not df_pos.empty:
+                    top_pos = get_top_keywords(df_pos["Teks_Bersih"], top_n=10)
+                    df_top_pos = pd.DataFrame(
+                        top_pos, columns=["Kata", "Frekuensi"]
+                    )
+                    st.dataframe(df_top_pos, hide_index=True)
+                else:
+                    st.info("Tidak ada data ulasan positif.")
+
+            with k_col2:
+                st.markdown("#### 🔴 Top 10 Kata Sentimen Negatif")
+                if not df_neg.empty:
+                    top_neg = get_top_keywords(df_neg["Teks_Bersih"], top_n=10)
+                    df_top_neg = pd.DataFrame(
+                        top_neg, columns=["Kata", "Frekuensi"]
+                    )
+                    st.dataframe(df_top_neg, hide_index=True)
+                else:
+                    st.info("Tidak ada data ulasan negatif.")
+
+            # --------------------------------------------------
             # SECTION 4: Distribusi Sentimen (Pie Chart)
             # --------------------------------------------------
             st.subheader("Distribusi Sentimen")
-
             c1, c2, c3 = st.columns([1, 2, 1])
             with c2:
                 fig = create_sentiment_pie(sentiment_count)
