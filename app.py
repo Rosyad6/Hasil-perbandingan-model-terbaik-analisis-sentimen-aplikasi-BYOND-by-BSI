@@ -25,7 +25,7 @@ def load_sastrawi():
     factory = StemmerFactory()
     stemmer = factory.create_stemmer()
 
-    # Daftar stopword yang lebih lengkap (termasuk kata umum aksi/penghubung)
+    # Daftar stopword yang lebih lengkap
     more_stop_words = [
         "yang",
         "dan",
@@ -96,7 +96,6 @@ def load_sastrawi():
         "terus",
     ]
 
-    # Menggabungkan stopword bawaan Sastrawi + tambahan manual
     base_stopwords = StopWordRemoverFactory().get_stop_words()
     all_stopwords = set(base_stopwords + more_stop_words)
 
@@ -126,28 +125,79 @@ def preprocess_text(text):
         return ""
 
     text = text.lower()
-    text = re.sub(r"http\S+", "", text)  # Hapus URL
-    text = re.sub(r"\d+", "", text)  # Hapus Angka
-    text = re.sub(r"[^a-zA-Z\s]", " ", text)  # Hapus Karakter Selain Huruf
+    text = re.sub(r"http\S+", "", text)
+    text = re.sub(r"\d+", "", text)
+    text = re.sub(r"[^a-zA-Z\s]", " ", text)
 
     tokens = text.split()
-
-    # Filtering Stopwords Tahap 1 & Hapus kata < 3 huruf (misal: "by", "in")
     tokens = [t for t in tokens if t not in stop_words_set and len(t) > 2]
 
-    # Stemming Sastrawi
     stemmed = [stemmer.stem(token) for token in tokens]
-
-    # Filtering Stopwords Tahap 2 (setelah kata di-stemming)
-    final_tokens = [t for t in stemmed if t not in stop_words_set and len(t) > 2]
+    final_tokens = [
+        t for t in stemmed if t not in stop_words_set and len(t) > 2
+    ]
 
     return " ".join(final_tokens)
 
 
-# 4. Fungsi Mengambil Kata Kunci Terbanyak
+# --------------------------------------------------
+# 4. KAMUS KATA NEGATIF & FUNGSI EKSTRAKSI KATA
+# --------------------------------------------------
+# Kamus Kata Negatif (Bisa Anda tambah/kurangi sesuai kebutuhan)
+KATA_NEGATIF_SET = {
+    "gagal",
+    "susah",
+    "lama",
+    "error",
+    "lambat",
+    "lemot",
+    "kecewa",
+    "buruk",
+    "jelek",
+    "parah",
+    "rugi",
+    "blokir",
+    "terblokir",
+    "hilang",
+    "potong",
+    "ribet",
+    "sulit",
+    "kendala",
+    "masalah",
+    "sampah",
+    "reset",
+    "turun",
+    "kurang",
+    "benci",
+    "kapok",
+    "pindah",
+    "bug",
+    "hang",
+    "stuck",
+    "lelet",
+    "payah",
+    "rusak",
+    "batal",
+    "denda",
+    "keluar",
+    "salah",
+    "terganggu",
+    "malah",
+    "miring",
+}
+
+
 def get_top_keywords(text_series, top_n=10):
     all_words = " ".join(text_series.dropna()).split()
     counter = Counter(all_words)
+    return counter.most_common(top_n)
+
+
+# Fungsi khusus kata negatif yang menyaring kata berdasarkan Kamus Negatif
+def get_top_negative_keywords(text_series, negative_lexicon, top_n=10):
+    all_words = " ".join(text_series.dropna()).split()
+    filtered_words = [word for word in all_words if word in negative_lexicon]
+    counter = Counter(filtered_words)
     return counter.most_common(top_n)
 
 
@@ -203,7 +253,6 @@ if uploaded_file is not None:
                     X_vec = vectorizer.transform(df["Teks_Bersih"])
                     df["Sentimen_Prediksi"] = model.predict(X_vec)
 
-                    # Menghitung Tingkat Kepercayaan (Confidence Score %)
                     if hasattr(model, "predict_proba"):
                         probabilities = model.predict_proba(X_vec)
                         max_probs = probabilities.max(axis=1) * 100
@@ -219,7 +268,7 @@ if uploaded_file is not None:
             st.session_state["df_result"] = df
             st.session_state["kolom_pilihan"] = kolom_pilihan
 
-        # Tampilkan Hasil Jika Sudah Diproses
+        # Tampilkan Hasil Jika Sudah Dipproses
         if "df_result" in st.session_state:
             df = st.session_state["df_result"]
             kolom_pilihan = st.session_state["kolom_pilihan"]
@@ -312,7 +361,10 @@ if uploaded_file is not None:
             with k_col2:
                 st.markdown("#### 🔴 Top 10 Kata Sentimen Negatif")
                 if not df_neg.empty:
-                    top_neg = get_top_keywords(df_neg["Teks_Bersih"], top_n=10)
+                    # Menggunakan fungsi khusus dengan penyaringan Kamus Negatif
+                    top_neg = get_top_negative_keywords(
+                        df_neg["Teks_Bersih"], KATA_NEGATIF_SET, top_n=10
+                    )
                     df_top_neg = pd.DataFrame(
                         top_neg, columns=["Kata", "Frekuensi"]
                     )
