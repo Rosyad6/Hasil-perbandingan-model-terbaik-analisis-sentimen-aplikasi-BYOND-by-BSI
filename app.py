@@ -100,10 +100,10 @@ stemmer, stop_words_remover_new = load_sastrawi()
 @st.cache_resource
 def load_model_and_vectorizer():
     try:
-        with open("model.pkl", "rb") as f:
-            model = pickle.load(f)
-        with open("vectorizer.pkl", "rb") as f:
-            vectorizer = pickle.load(f)
+        with open("naive_bayes.joblib", "rb") as f:
+            model = joblib.load(f)
+        with open("tfidf.joblib", "rb") as f:
+            vectorizer = joblib.load(f)
         return model, vectorizer
     except FileNotFoundError:
         return None, None
