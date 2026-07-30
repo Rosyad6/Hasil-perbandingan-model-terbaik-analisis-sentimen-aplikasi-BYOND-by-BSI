@@ -25,6 +25,7 @@ def load_sastrawi():
     factory = StemmerFactory()
     stemmer = factory.create_stemmer()
 
+    # Daftar stopword yang lebih lengkap (termasuk kata umum aksi/penghubung)
     more_stop_words = [
         "yang",
         "dan",
@@ -83,18 +84,26 @@ def load_sastrawi():
         "aplikasi",
         "byond",
         "bsi",
+        "by",
+        "mau",
+        "buka",
+        "masuk",
+        "sering",
+        "padahal",
+        "kalo",
+        "kalau",
+        "bikin",
+        "terus",
     ]
 
-    stop_words = StopWordRemoverFactory().get_stop_words()
-    stop_words.extend(more_stop_words)
+    # Menggabungkan stopword bawaan Sastrawi + tambahan manual
+    base_stopwords = StopWordRemoverFactory().get_stop_words()
+    all_stopwords = set(base_stopwords + more_stop_words)
 
-    new_array = ArrayDictionary(stop_words)
-    stop_words_remover_new = StopWordRemover(new_array)
-
-    return stemmer, stop_words_remover_new
+    return stemmer, all_stopwords
 
 
-stemmer, stop_words_remover_new = load_sastrawi()
+stemmer, stop_words_set = load_sastrawi()
 
 
 # 2. Caching Load Model & Vectorizer
@@ -115,15 +124,24 @@ model, vectorizer = load_model_and_vectorizer()
 def preprocess_text(text):
     if not isinstance(text, str):
         return ""
+
     text = text.lower()
-    text = re.sub(r"http\S+", "", text)
-    text = re.sub(r"\d+", "", text)
-    text = re.sub(r"[^a-zA-Z\s]", " ", text)
+    text = re.sub(r"http\S+", "", text)  # Hapus URL
+    text = re.sub(r"\d+", "", text)  # Hapus Angka
+    text = re.sub(r"[^a-zA-Z\s]", " ", text)  # Hapus Karakter Selain Huruf
+
     tokens = text.split()
+
+    # Filtering Stopwords Tahap 1 & Hapus kata < 3 huruf (misal: "by", "in")
+    tokens = [t for t in tokens if t not in stop_words_set and len(t) > 2]
+
+    # Stemming Sastrawi
     stemmed = [stemmer.stem(token) for token in tokens]
-    text = " ".join(stemmed)
-    text = stop_words_remover_new.remove(text)
-    return text
+
+    # Filtering Stopwords Tahap 2 (setelah kata di-stemming)
+    final_tokens = [t for t in stemmed if t not in stop_words_set and len(t) > 2]
+
+    return " ".join(final_tokens)
 
 
 # 4. Fungsi Mengambil Kata Kunci Terbanyak
