@@ -1,7 +1,7 @@
 import joblib
-import re
 import matplotlib.pyplot as plt
 import pandas as pd
+import re
 import streamlit as st
 from Sastrawi.Dictionary.ArrayDictionary import ArrayDictionary
 from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
@@ -18,7 +18,7 @@ st.set_page_config(
 )
 
 
-# 1. Caching Inisialisasi Sastrawi agar loading cepat
+# 1. Caching Inisialisasi Sastrawi
 @st.cache_resource
 def load_sastrawi():
     factory = StemmerFactory()
@@ -96,16 +96,14 @@ def load_sastrawi():
 stemmer, stop_words_remover_new = load_sastrawi()
 
 
-# 2. Caching Load Model & Vectorizer
+# 2. Caching Load Model & Vectorizer (Menggunakan Joblib & Folder 'model/')
 @st.cache_resource
 def load_model_and_vectorizer():
     try:
-        with open("naive_bayes.joblib", "rb") as f:
-            model = joblib.load(f)
-        with open("tfidf.joblib", "rb") as f:
-            vectorizer = joblib.load(f)
+        model = joblib.load("model/naive_bayes.joblib")
+        vectorizer = joblib.load("model/tfidf.joblib")
         return model, vectorizer
-    except FileNotFoundError:
+    except Exception as e:
         return None, None
 
 
@@ -127,11 +125,22 @@ def preprocess_text(text):
     return text
 
 
-# 4. Fungsi Pie Chart (Sudah Disesuaikan untuk Tema Gelap & Ukuran Pas)
+# 4. Fungsi Aturan Sentimen Berdasarkan Nilai Skor/Rating
+def get_sentiment_by_score(score):
+    try:
+        score = float(score)
+        if score <= 2:
+            return "Negative"
+        else:
+            return "Positive"
+    except (ValueError, TypeError):
+        return "Positive"
+
+
+# 5. Fungsi Visualisasi Pie Chart
 def create_sentiment_pie(sentiment_count):
     fig, ax = plt.subplots(figsize=(3.5, 3.5))
 
-    # Membuat background transparan
     fig.patch.set_alpha(0.0)
     ax.patch.set_alpha(0.0)
 
@@ -152,7 +161,7 @@ def create_sentiment_pie(sentiment_count):
 
 
 # ==========================================
-# 5. ANTARMUKA STREAMLIT
+# 6. ANTARMUKA STREAMLIT
 # ==========================================
 
 st.title("Aplikasi Analisis Sentimen Menggunakan Naive Bayes")
@@ -169,24 +178,40 @@ if uploaded_file is not None:
 
         st.success(f"File '{uploaded_file.name}' berhasil diunggah!")
 
-        # Pilih Kolom Teks Ulasan
+        # Opsi Pilihan Kolom Teks Ulasan
         kolom_pilihan = st.selectbox("Pilih kolom ulasan:", df.columns)
 
+        # Cek secara otomatis jika ada kolom skor/rating di dataset
+        kolom_score = None
+        possible_score_cols = [
+            c
+            for c in df.columns
+            if c.lower() in ["score", "rating", "star", "skor"]
+        ]
+        if possible_score_cols:
+            kolom_score = st.selectbox(
+                "Pilih kolom nilai/skor ulasan (opsional):", possible_score_cols
+            )
+
         if st.button("Lakukan Analisis Sentimen"):
-            with st.spinner("Memproses preprocessing data dan prediksi..."):
+            with st.spinner("Memproses data..."):
                 # Step A: Preprocessing Teks
                 df["Teks_Bersih"] = df[kolom_pilihan].apply(preprocess_text)
 
                 # Step B: Prediksi Sentimen
                 if model is not None and vectorizer is not None:
+                    # Menggunakan Model ML untuk memprediksi
                     X_vec = vectorizer.transform(df["Teks_Bersih"])
                     df["Sentimen_Prediksi"] = model.predict(X_vec)
+                elif kolom_score and kolom_score in df.columns:
+                    # Menggunakan Logika Skor (<=2 Negatif, >=3 Positif)
+                    df["Sentimen_Prediksi"] = df[kolom_score].apply(
+                        get_sentiment_by_score
+                    )
+                elif "sentiment" in df.columns:
+                    df["Sentimen_Prediksi"] = df["sentiment"]
                 else:
-                    # Jika model.pkl belum ada, mengambil dari kolom sentimen lama jika ada
-                    if "sentiment" in df.columns:
-                        df["Sentimen_Prediksi"] = df["sentiment"]
-                    else:
-                        df["Sentimen_Prediksi"] = "Positive"
+                    df["Sentimen_Prediksi"] = "Positive"
 
             # --------------------------------------------------
             # SECTION 1: Pratinjau Dataset
@@ -234,14 +259,13 @@ if uploaded_file is not None:
             # --------------------------------------------------
             st.subheader("Distribusi Sentimen")
 
-            # Memposisikan Pie Chart di tengah menggunakan kolom
             c1, c2, c3 = st.columns([1, 2, 1])
             with c2:
                 fig = create_sentiment_pie(sentiment_count)
                 st.pyplot(fig, use_container_width=False)
 
             # --------------------------------------------------
-            # SECTION 5: Tombol Unduh Hasil Prediksi
+            # SECTION 5: Tombol Unduh Hasil
             # --------------------------------------------------
             st.divider()
             csv_data = df.to_csv(index=False).encode("utf-8")
@@ -254,9 +278,3 @@ if uploaded_file is not None:
 
     except Exception as e:
         st.error(f"Terjadi kesalahan saat memproses data: {e}")
-
-        st.subheader(
-            "Hasil Prediksi"
-        )
-
-        st.dataframe(df)
