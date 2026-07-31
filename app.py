@@ -232,7 +232,7 @@ st.markdown("<br>", unsafe_allow_html=True)
 
 # Menampilkan Logo BYOND by BSI di Kiri Atas
 try:
-    st.image("assets/logo.png", width=120)
+    st.image("assets/logo.png", width=250)
 except Exception:
     pass
     
