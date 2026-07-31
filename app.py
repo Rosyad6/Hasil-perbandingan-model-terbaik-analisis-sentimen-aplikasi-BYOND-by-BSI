@@ -227,17 +227,16 @@ def create_sentiment_pie(sentiment_count):
 # 6. ANTARMUKA STREAMLIT
 # ==========================================
 
-col_logo, col_title = st.columns([1, 5])
+# Menambahkan jarak kosong agar logo sedikit turun
+st.markdown("<br>", unsafe_allow_html=True) 
 
-with col_logo:
-    try:
-        st.image("assets/logo.png", width=200)
-    except Exception:
-        pass  # Mencegah error jika gambar belum ada/lokasi tidak ditemukan
-
-with col_title:
-    st.title("Aplikasi Analisis Sentimen Menggunakan Naive Bayes")
+# Menampilkan Logo BYOND by BSI di Kiri Atas
+try:
+    st.image("assets/logo.png", width=120)
+except Exception:
+    pass
     
+st.title("Aplikasi Analisis Sentimen Menggunakan Naive Bayes")
 st.write("Upload dataset untuk melakukan analisis sentimen.")
 
 uploaded_file = st.file_uploader("Upload Dataset", type=["csv", "xlsx"])
