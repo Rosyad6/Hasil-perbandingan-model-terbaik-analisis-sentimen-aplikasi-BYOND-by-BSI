@@ -227,11 +227,6 @@ def create_sentiment_pie(sentiment_count):
 # 6. ANTARMUKA STREAMLIT
 # ==========================================
 
-col_logo = st.columns([1, 5])
-
-with col_logo:
-    st.image("assets/logo.png", width=120)
-
 st.title("Aplikasi Analisis Sentimen Menggunakan Naive Bayes")
 st.write("Upload dataset untuk melakukan analisis sentimen.")
 
