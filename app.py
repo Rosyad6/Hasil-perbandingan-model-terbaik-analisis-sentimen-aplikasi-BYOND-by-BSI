@@ -231,7 +231,7 @@ col_logo, col_title = st.columns([1, 5])
 
 with col_logo:
     try:
-        st.image("assets/logo.png", width=150)
+        st.image("assets/logo.png", width=170)
     except Exception:
         pass  # Mencegah error jika gambar belum ada/lokasi tidak ditemukan
 
