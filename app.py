@@ -541,7 +541,7 @@ elif menu_choice == "ℹ️ Info & Metodologi":
     1. **Business Understanding:** Memahami kebutuhan evaluasi kepuasan pengguna aplikasi mobile banking BYOND by BSI.
     2. **Data Understanding:** Pengumpulan data ulasan (scraping ulasan Google Play Store).
     3. **Data Preparation:** Pembersihan data, tokenisasi, filtering stopword Sastrawi, stemming, dan pembentukan TF-IDF vectorizer.
-    4. **Modeling:** Pelatihan algoritma **Naive Bayes Classifier**.
+    4. **Modeling:** Pelatihan algoritma **Naive Bayes**.
     5. **Evaluation:** Evaluasi performa model melalui matriks Akurasi, Precision, Recall, dan F1-Score.
     6. **Deployment:** Peluncuran antarmuka interaktif berbasis web menggunakan **Streamlit**.
     """
