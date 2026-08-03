@@ -203,25 +203,43 @@ def get_top_negative_keywords(text_series, negative_lexicon, top_n=10):
 
 # 5. Fungsi Visualisasi Pie Chart
 def create_sentiment_pie(sentiment_count):
-    fig, ax = plt.subplots(figsize=(3.5, 3.5))
+    fig, ax = plt.subplots(figsize=(4, 4))
     fig.patch.set_alpha(0.0)
     ax.patch.set_alpha(0.0)
 
+    # Menentukan warna slice (Hijau = Positif, Merah = Negatif)
+    color_map = {
+        "Positive": "#2ecc71",
+        "Positif": "#2ecc71",
+        "Negative": "#e74c3c",
+        "Negatif": "#e74c3c",
+    }
+    colors = [
+        color_map.get(label, "#3498db") for label in sentiment_count.index
+    ]
+
     wedges, texts, autotexts = ax.pie(
         sentiment_count,
-        labels=sentiment_count.index,
+        labels=sentiment_count.index,  # Menampilkan nama label (Positif/Negatif)
         autopct="%1.1f%%",
         startangle=90,
-        textprops={"color": "white", "fontsize": 10},
+        colors=colors,
+        pctdistance=0.55,  # Posisi angka persentase di dalam lingkaran
     )
 
+    # 1. Atur Teks Persentase di DALAM lingkaran (Putih & Tebal)
     for autotext in autotexts:
         autotext.set_color("white")
         autotext.set_weight("bold")
+        autotext.set_fontsize(11)
 
-    ax.set_title("Distribusi Sentimen", color="white", fontsize=12, pad=10)
+    # 2. Atur Teks Label (Positif/Negatif) di LUAR lingkaran (Warna Gelap & Tebal)
+    for text in texts:
+        text.set_color("#222222")  # Warna gelap agar terlihat jelas di latar terang
+        text.set_weight("bold")
+        text.set_fontsize(11)
+
     return fig
-
 
 # ==========================================
 # 6. ANTARMUKA STREAMLIT
