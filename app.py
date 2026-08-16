@@ -279,8 +279,8 @@ with st.sidebar:
 # ==================================================
 # HALAMAN 1: ANALISIS DATASET (BATCH)
 # ==================================================
-if menu_choice == "📊 Analisis Dataset (Batch)":
-    st.title("📊 Analisis Sentimen Ulasan App BYOND")
+if menu_choice == "Analisis Dataset (Batch)":
+    st.title("Analisis Sentimen Ulasan App BYOND")
     st.write(
         "Upload file dataset ulasan dalam format `.csv` atau `.xlsx` untuk melakukan preprocessing dan pengujian otomatis."
     )
@@ -307,7 +307,7 @@ if menu_choice == "📊 Analisis Dataset (Batch)":
             with col_btn:
                 st.write("")
                 st.write("")
-                btn_proses = st.button("🚀 Jalankan Analisis", type="primary")
+                btn_proses = st.button("Jalankan Analisis", type="primary")
 
             if btn_proses:
                 with st.spinner(
@@ -359,15 +359,15 @@ if menu_choice == "📊 Analisis Dataset (Batch)":
                 )
 
                 col1.metric("Total Ulasan", total_ulasan)
-                col2.metric("🟢 Positif", total_positif)
-                col3.metric("🔴 Negatif", total_negatif)
-                col4.metric("🏆 Dominan", sentimen_dominan)
+                col2.metric("Positif", total_positif)
+                col3.metric("Negatif", total_negatif)
+                col4.metric("Dominan", sentimen_dominan)
 
                 # Layout Visualisasi Pie + Keyword
                 v_col1, v_col2 = st.columns([1, 1.2])
 
                 with v_col1:
-                    st.subheader("🥧 Distribusi Sentimen")
+                    st.subheader("Distribusi Sentimen")
                     fig = create_sentiment_pie(sentiment_count)
                     st.pyplot(fig, use_container_width=True)
 
@@ -469,8 +469,8 @@ if menu_choice == "📊 Analisis Dataset (Batch)":
 # ==================================================
 # HALAMAN 2: UJI TEKS LIVE (REAL-TIME PREDICTION)
 # ==================================================
-elif menu_choice == "💬 Uji Teks Live (Real-Time)":
-    st.title("💬 Uji Sentimen Teks Tunggal")
+elif menu_choice == "Uji Teks Live (Real-Time)":
+    st.title("Uji Sentimen Teks Tunggal")
     st.write(
         "Ketik atau tempel (*paste*) ulasan pengguna secara langsung untuk menguji prediksi model secara *real-time*."
     )
@@ -529,8 +529,8 @@ elif menu_choice == "💬 Uji Teks Live (Real-Time)":
 # ==================================================
 # HALAMAN 3: INFO & METODOLOGI
 # ==================================================
-elif menu_choice == "ℹ️ Info & Metodologi":
-    st.title("ℹ️ Tentang Aplikasi & Metodologi Penelitian")
+elif menu_choice == "Info & Metodologi":
+    st.title("Tentang Aplikasi & Metodologi Penelitian")
 
     st.markdown(
         """
@@ -551,7 +551,7 @@ elif menu_choice == "ℹ️ Info & Metodologi":
 
     col_info1, col_info2 = st.columns(2)
     with col_info1:
-        st.markdown("#### 🛠️ Tech Stack")
+        st.markdown("#### Tech Stack")
         st.markdown(
             """
         * **Language:** Python 3
