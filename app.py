@@ -54,8 +54,8 @@ stemmer, stop_words_set = load_sastrawi()
 @st.cache_resource
 def load_model_and_vectorizer():
     try:
-        model = joblib.load("naive_bayes.joblib")
-        vectorizer = joblib.load("tfidf.joblib")
+        model = joblib.load("model/naive_bayes.joblib")
+        vectorizer = joblib.load("model/tfidf.joblib")
         return model, vectorizer
     except Exception:
         return None, None
